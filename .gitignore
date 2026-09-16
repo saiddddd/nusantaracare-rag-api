@@ -1,0 +1,21 @@
+# secrets
+.env
+*.env.local
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# vector index (rebuildable from data/raw_docs via build_index.py)
+data/index/
+
+# FastAPI Cloud local link
+.fastapicloud/
+
+# os / editor
+.DS_Store
+.vscode/
+*.log
