@@ -35,6 +35,29 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+def build_index_if_empty() -> None:
+    """
+    Auto-build index vektor sekali saat aplikasi start, HANYA jika index
+    masih kosong (mis. deployment baru di FastAPI Cloud, yang tidak
+    menjalankan app/scripts/build_index.py secara manual seperti di lokal).
+    Aman dijalankan berkali-kali: kalau index sudah terisi, langsung
+    dilewati. Kegagalan di sini TIDAK menjatuhkan startup aplikasi — hanya
+    dicatat sebagai error, supaya /health tetap bisa diakses untuk
+    diagnosis (lihat komponen "vector_db" di response-nya).
+    """
+    try:
+        if database.count() == 0:
+            logger.info("Index vektor kosong — menjalankan build_index otomatis...")
+            from app.scripts import build_index
+
+            build_index.main()
+        else:
+            logger.info("Index vektor sudah terisi (%d chunk), skip auto-build.", database.count())
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Auto-build index saat startup gagal: %s", exc)
+
+
 @app.get("/")
 def read_root():
     return {
