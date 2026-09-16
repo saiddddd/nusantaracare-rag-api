@@ -9,7 +9,7 @@ groq>=0.11
 fastembed>=0.4
 
 # --- Vector database ---
-chromadb>=0.5
+#chromadb>=0.5
 
 
 
